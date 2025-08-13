@@ -1,0 +1,82 @@
+{
+  "name": "lazycommit",
+  "displayName": "Lazy Commit",
+  "description": "Summarize your Git changes with AI and commit the message for you.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:lazyCommit.generateMessage",
+    "onCommand:lazyCommit.generateAndCommit"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "lazyCommit.generateMessage",
+        "title": "Lazy Commit: Generate Commit Message"
+      },
+      {
+        "command": "lazyCommit.generateAndCommit",
+        "title": "Lazy Commit: Generate And Commit"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Lazy Commit",
+      "properties": {
+        "lazyCommit.provider": {
+          "type": "string",
+          "enum": [
+            "openai"
+          ],
+          "default": "openai",
+          "description": "AI provider to use. Currently supports 'openai'."
+        },
+        "lazyCommit.openai.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "OpenAI model to use for generating commit messages."
+        },
+        "lazyCommit.openai.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "OpenAI API key. If empty, the extension will use the `OPENAI_API_KEY` environment variable.",
+          "scope": "machine"
+        },
+        "lazyCommit.style": {
+          "type": "string",
+          "enum": [
+            "conventional",
+            "natural"
+          ],
+          "default": "conventional",
+          "description": "Style of commit message. 'conventional' produces Conventional Commits; 'natural' is a concise plain-English summary."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.5.4",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "openai": "^4.58.2",
+    "undici": "^5.27.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
