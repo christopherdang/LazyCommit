@@ -94,15 +94,23 @@ async function generateMessage(diffText: string): Promise<string> {
   }
 
   const model = config.get<string>("lazyCommit.openai.model", "gpt-4o-mini");
+  const useProxy = config.get<boolean>("lazyCommit.openai.useProxy", false);
+  const proxyBaseUrl = (config.get<string>("lazyCommit.openai.proxyBaseUrl") || "").trim();
+  const proxyHeaders = config.get<Record<string, string>>("lazyCommit.openai.proxyHeaders", {});
   const apiKey = (config.get<string>("lazyCommit.openai.apiKey") || process.env.OPENAI_API_KEY || "").trim();
-  if (!apiKey) {
-    throw new Error("OpenAI API key not set. Provide `lazyCommit.openai.apiKey` or the OPENAI_API_KEY env var.");
+  if (!useProxy && !apiKey) {
+    throw new Error("OpenAI API key not set. Provide `lazyCommit.openai.apiKey` or the OPENAI_API_KEY env var, or enable proxy mode.");
+  }
+  if (useProxy && !proxyBaseUrl) {
+    throw new Error("Proxy mode enabled but `lazyCommit.openai.proxyBaseUrl` is not set.");
   }
 
   const systemPrompt = buildSystemPrompt(style);
   const userPrompt = buildUserPrompt(diffText);
   const fewShot = fewShotEnabled ? buildFewShotMessages(style, fewShotNum) : undefined;
-  const openai = new OpenAIProvider(apiKey, model);
+  const baseUrl = useProxy ? proxyBaseUrl : "https://api.openai.com/v1";
+  const headers = useProxy ? (proxyHeaders || {}) : {};
+  const openai = new OpenAIProvider(apiKey, model, baseUrl, headers);
   const message = await openai.generateCommitMessage(systemPrompt, userPrompt, fewShot);
   return sanitizeCommitMessage(message);
 }

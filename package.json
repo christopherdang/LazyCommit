@@ -50,6 +50,24 @@
           "markdownDescription": "OpenAI API key. If empty, the extension will use the `OPENAI_API_KEY` environment variable.",
           "scope": "machine"
         },
+        "lazyCommit.openai.useProxy": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Enable calling a proxy endpoint you host that attaches your OpenAI key server-side. When enabled, `proxyBaseUrl` is required and `apiKey` is optional (and typically blank).",
+          "scope": "application"
+        },
+        "lazyCommit.openai.proxyBaseUrl": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Base URL of your proxy server that forwards to OpenAI (e.g., `https://yourdomain.com/api/openai`). The extension will POST to `${proxyBaseUrl}/chat/completions`.",
+          "scope": "application"
+        },
+        "lazyCommit.openai.proxyHeaders": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Optional static headers to send to your proxy (e.g., `{\"x-api-key\": \"<public-token>\"}`). Do not put secrets here; your proxy should validate and inject your OpenAI key server-side.",
+          "scope": "application"
+        },
         "lazyCommit.style": {
           "type": "string",
           "enum": [
@@ -76,7 +94,9 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "watch": "tsc -w -p ./"
+    "watch": "tsc -w -p ./",
+    "proxy:start": "npm --prefix proxy run start",
+    "proxy:dev": "npm --prefix proxy run dev"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

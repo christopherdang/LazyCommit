@@ -1,10 +1,14 @@
 export class OpenAIProvider {
   private apiKey: string;
   private model: string;
+  private baseUrl: string;
+  private extraHeaders: Record<string, string>;
 
-  constructor(apiKey: string, model: string) {
+  constructor(apiKey: string, model: string, baseUrl: string = "https://api.openai.com/v1", extraHeaders: Record<string, string> = {}) {
     this.apiKey = apiKey;
     this.model = model;
+    this.baseUrl = baseUrl.replace(/\/$/, "");
+    this.extraHeaders = { ...extraHeaders };
   }
 
   async generateCommitMessage(
@@ -12,12 +16,17 @@ export class OpenAIProvider {
     userPrompt: string,
     fewShotMessages?: { role: "user" | "assistant" | "system"; content: string }[]
   ): Promise<string> {
-    const response = await (globalThis as any).fetch("https://api.openai.com/v1/chat/completions", {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...this.extraHeaders
+    };
+    if (this.apiKey) {
+      headers["Authorization"] = `Bearer ${this.apiKey}`;
+    }
+
+    const response = await (globalThis as any).fetch(`${this.baseUrl}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.apiKey}`
-      },
+      headers,
       body: JSON.stringify({
         model: this.model,
         temperature: 0.2,

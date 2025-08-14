@@ -2,17 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenAIProvider = void 0;
 class OpenAIProvider {
-    constructor(apiKey, model) {
+    constructor(apiKey, model, baseUrl = "https://api.openai.com/v1", extraHeaders = {}) {
         this.apiKey = apiKey;
         this.model = model;
+        this.baseUrl = baseUrl.replace(/\/$/, "");
+        this.extraHeaders = { ...extraHeaders };
     }
     async generateCommitMessage(systemPrompt, userPrompt, fewShotMessages) {
-        const response = await globalThis.fetch("https://api.openai.com/v1/chat/completions", {
+        const headers = {
+            "Content-Type": "application/json",
+            ...this.extraHeaders
+        };
+        if (this.apiKey) {
+            headers["Authorization"] = `Bearer ${this.apiKey}`;
+        }
+        const response = await globalThis.fetch(`${this.baseUrl}/chat/completions`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.apiKey}`
-            },
+            headers,
             body: JSON.stringify({
                 model: this.model,
                 temperature: 0.2,
