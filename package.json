@@ -2,7 +2,7 @@
   "name": "lazycommit",
   "displayName": "Lazy Commit",
   "description": "Summarize your Git changes with AI and commit the message for you.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "ChristopherDang",
   "icon": "images/icon.png",
   "engines": {
