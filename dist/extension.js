@@ -107,6 +107,8 @@ async function generateMessage(diffText) {
     const config = vscode.workspace.getConfiguration();
     const provider = config.get("lazyCommit.provider", "openai");
     const style = config.get("lazyCommit.style", "conventional");
+    const fewShotEnabled = config.get("lazyCommit.fewShot.enabled", true);
+    const fewShotNum = config.get("lazyCommit.fewShot.numExamples", 3);
     if (provider !== "openai") {
         throw new Error("Unsupported provider. Configure `lazyCommit.provider` to 'openai'.");
     }
@@ -117,8 +119,9 @@ async function generateMessage(diffText) {
     }
     const systemPrompt = (0, prompt_1.buildSystemPrompt)(style);
     const userPrompt = (0, prompt_1.buildUserPrompt)(diffText);
+    const fewShot = fewShotEnabled ? (0, prompt_1.buildFewShotMessages)(style, fewShotNum) : undefined;
     const openai = new openaiProvider_1.OpenAIProvider(apiKey, model);
-    const message = await openai.generateCommitMessage(systemPrompt, userPrompt);
+    const message = await openai.generateCommitMessage(systemPrompt, userPrompt, fewShot);
     return sanitizeCommitMessage(message);
 }
 async function getRepoRoot() {

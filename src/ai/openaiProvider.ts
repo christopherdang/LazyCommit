@@ -9,7 +9,11 @@ export class OpenAIProvider {
     this.model = model;
   }
 
-  async generateCommitMessage(systemPrompt: string, userPrompt: string): Promise<string> {
+  async generateCommitMessage(
+    systemPrompt: string,
+    userPrompt: string,
+    fewShotMessages?: { role: "user" | "assistant" | "system"; content: string }[]
+  ): Promise<string> {
     const response = await undiciFetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -22,6 +26,7 @@ export class OpenAIProvider {
         max_tokens: 200,
         messages: [
           { role: "system", content: systemPrompt },
+          ...(fewShotMessages ?? []),
           { role: "user", content: userPrompt }
         ]
       })

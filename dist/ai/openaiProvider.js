@@ -7,7 +7,7 @@ class OpenAIProvider {
         this.apiKey = apiKey;
         this.model = model;
     }
-    async generateCommitMessage(systemPrompt, userPrompt) {
+    async generateCommitMessage(systemPrompt, userPrompt, fewShotMessages) {
         const response = await (0, undici_1.fetch)("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -20,6 +20,7 @@ class OpenAIProvider {
                 max_tokens: 200,
                 messages: [
                     { role: "system", content: systemPrompt },
+                    ...(fewShotMessages ?? []),
                     { role: "user", content: userPrompt }
                 ]
             })

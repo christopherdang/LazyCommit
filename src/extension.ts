@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { exec as execCb } from "child_process";
 import { promisify } from "util";
 import { OpenAIProvider } from "./ai/openaiProvider";
-import { buildSystemPrompt, buildUserPrompt } from "./prompt";
+import { buildSystemPrompt, buildUserPrompt, buildFewShotMessages } from "./prompt";
 
 const exec = promisify(execCb);
 const EXEC_MAX_BUFFER = 64 * 1024 * 1024; // 64MB to handle large diffs
@@ -86,6 +86,8 @@ async function generateMessage(diffText: string): Promise<string> {
   const config = vscode.workspace.getConfiguration();
   const provider = config.get<string>("lazyCommit.provider", "openai");
   const style = config.get<"conventional" | "natural">("lazyCommit.style", "conventional");
+  const fewShotEnabled = config.get<boolean>("lazyCommit.fewShot.enabled", true);
+  const fewShotNum = config.get<number>("lazyCommit.fewShot.numExamples", 3);
 
   if (provider !== "openai") {
     throw new Error("Unsupported provider. Configure `lazyCommit.provider` to 'openai'.");
@@ -99,8 +101,9 @@ async function generateMessage(diffText: string): Promise<string> {
 
   const systemPrompt = buildSystemPrompt(style);
   const userPrompt = buildUserPrompt(diffText);
+  const fewShot = fewShotEnabled ? buildFewShotMessages(style, fewShotNum) : undefined;
   const openai = new OpenAIProvider(apiKey, model);
-  const message = await openai.generateCommitMessage(systemPrompt, userPrompt);
+  const message = await openai.generateCommitMessage(systemPrompt, userPrompt, fewShot);
   return sanitizeCommitMessage(message);
 }
 

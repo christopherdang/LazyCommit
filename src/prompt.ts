@@ -35,3 +35,74 @@ function truncateDiff(diffText: string, maxChars: number): string {
   return `${head}\n...\n[diff truncated]\n...\n${tail}`;
 }
 
+export function buildFewShotMessages(
+  style: "conventional" | "natural",
+  maxExamples: number
+): { role: "user" | "assistant"; content: string }[] {
+  const examplesConventional: { user: string; assistant: string }[] = [
+    {
+      user: [
+        "Diff to summarize:",
+        "",
+        "diff --git a/src/api/user.ts b/src/api/user.ts",
+        "--- a/src/api/user.ts",
+        "+++ b/src/api/user.ts",
+        "@@",
+        "+ export async function createUser(req, res) {",
+        "+   // create user from request body",
+        "+   // ...",
+        "+ }"
+      ].join("\n"),
+      assistant: "feat(api): add user creation endpoint"
+    },
+    {
+      user: [
+        "Diff to summarize:",
+        "",
+        "diff --git a/src/ui/Sidebar.tsx b/src/ui/Sidebar.tsx",
+        "--- a/src/ui/Sidebar.tsx",
+        "+++ b/src/ui/Sidebar.tsx",
+        "@@",
+        "- const isOpen = user.settings.sidebar.open;",
+        "+ const isOpen = user?.settings?.sidebar?.open ?? false;"
+      ].join("\n"),
+      assistant: "fix(ui): prevent crash when toggling sidebar without user"
+    },
+    {
+      user: [
+        "Diff to summarize:",
+        "",
+        "diff --git a/src/core/data.ts b/src/core/data.ts",
+        "--- a/src/core/data.ts",
+        "+++ b/src/core/data.ts",
+        "@@",
+        "- export async function fetchData() {",
+        "+ export async function loadData() {",
+        "@@",
+        "+ // extracted parse util"
+      ].join("\n"),
+      assistant: "refactor(core): rename fetchData to loadData and extract util"
+    }
+  ];
+  const examplesNatural: { user: string; assistant: string }[] = [
+    {
+      user: examplesConventional[0].user,
+      assistant: "Add user creation endpoint"
+    },
+    {
+      user: examplesConventional[1].user,
+      assistant: "Prevent crash when toggling sidebar without user"
+    },
+    {
+      user: examplesConventional[2].user,
+      assistant: "Rename fetchData to loadData and extract util"
+    }
+  ];
+  const source = style === "conventional" ? examplesConventional : examplesNatural;
+  const limited = source.slice(0, Math.max(0, Math.min(maxExamples, source.length)));
+  return limited.flatMap(e => [
+    { role: "user" as const, content: e.user },
+    { role: "assistant" as const, content: e.assistant }
+  ]);
+}
+
