@@ -4,7 +4,7 @@
   "description": "Summarize your Git changes with AI and commit the message for you.",
   "version": "0.0.1",
   "publisher": "ChristopherDang",
-  "icon": "src/images/LazyCommit_Icon.png",
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -88,6 +88,14 @@
     "openai": "^4.58.2",
     "undici": "^5.27.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/christopherdang/LazyCommit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/christopherdang/LazyCommit/issues"
+  },
+  "homepage": "https://github.com/christopherdang/LazyCommit#readme",
   "keywords": [],
   "author": "",
   "license": "ISC",
