@@ -1,14 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenAIProvider = void 0;
-const undici_1 = require("undici");
 class OpenAIProvider {
     constructor(apiKey, model) {
         this.apiKey = apiKey;
         this.model = model;
     }
     async generateCommitMessage(systemPrompt, userPrompt, fewShotMessages) {
-        const response = await (0, undici_1.fetch)("https://api.openai.com/v1/chat/completions", {
+        const response = await globalThis.fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

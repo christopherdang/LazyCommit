@@ -1,5 +1,3 @@
-import { fetch as undiciFetch } from "undici";
-
 export class OpenAIProvider {
   private apiKey: string;
   private model: string;
@@ -14,7 +12,7 @@ export class OpenAIProvider {
     userPrompt: string,
     fewShotMessages?: { role: "user" | "assistant" | "system"; content: string }[]
   ): Promise<string> {
-    const response = await undiciFetch("https://api.openai.com/v1/chat/completions", {
+    const response = await (globalThis as any).fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
